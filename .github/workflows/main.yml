@@ -1,0 +1,33 @@
+
+name: CI with DevSecOps 
+
+on:
+    push:
+        branches: [main]
+
+jobs:
+    # Secret Scanning
+    secret-scanning:
+        uses: ./.github/workflows/secret-scanning.yml
+
+    # Dependency Checks
+    dependency-checks:
+        uses: ./.github/workflows/dependency-scan.yml
+
+    # Docker Checks
+    docker-checks:
+        uses: ./.github/workflows/docker-scan.yml
+        secrets: inherit 
+
+#    code-tests:
+#        uses: ./.github/workflows/code-tests.yml   
+
+    docker-push:
+        uses: ./.github/workflows/docker-push.yml
+#        needs: [docker-checks,dependency-checks,secret-scanning]
+        secrets: inherit 
+
+    deploy-on-push:
+        needs: [docker-push]
+        uses: ./.github/workflows/deploy.yml
+        secrets: inherit
